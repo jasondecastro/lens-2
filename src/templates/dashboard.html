@@ -13,17 +13,12 @@
     <meta name="author" content="">
 
     <title>
-      
-        Light UI &middot; Dashboard theme &middot; Official Bootstrap Themes
-      
+      __Dashboard 
     </title>
 
     <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet">
-    
-      <link href="../assets/css/toolkit-light.css" rel="stylesheet">
-    
-    
-    <link href="../assets/css/application.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/toolkit-light.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/application.js') }}" rel="stylesheet">
 
     <style>
       /* note: this is a hack for ios iframe for bootstrap themes shopify page */
@@ -430,11 +425,12 @@
 </div>
 
 
-    <script src="../assets/js/jquery.min.js"></script>
-    <script src="../assets/js/chart.js"></script>
-    <script src="../assets/js/tablesorter.min.js"></script>
-    <script src="../assets/js/toolkit.js"></script>
-    <script src="../assets/js/application.js"></script>
+    <script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/chart.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/toolkit.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/tablesorter.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/application.js') }}"></script>
+
     <script>
       // execute/clear BS loaders for docs
       $(function(){while(window.BS&&window.BS.loader&&window.BS.loader.length){(window.BS.loader.pop())()}})

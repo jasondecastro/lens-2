@@ -1,122 +1,29 @@
 
-/*
- * Application level styles
- * (things that dont make sense in a toolkit :)
- * copyright @colossal 2015
- */
-
-.material-switch > input[type="checkbox"] {
-    display: none;   
+/* global body padding */
+body {
+  padding-top:    20px;
+  padding-bottom: 20px;
 }
 
-.material-switch > label {
-    cursor: pointer;
-    height: 0px;
-    position: relative; 
-    width: 40px;  
-}
-
-.material-switch > label::before {
-    background: rgb(0, 0, 0);
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
-    content: '';
-    height: 16px;
-    margin-top: -8px;
-    position:absolute;
-    opacity: 0.3;
-    transition: all 0.4s ease-in-out;
-    width: 40px;
-}
-.material-switch > label::after {
-    background: rgb(255, 255, 255);
-    border-radius: 16px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-    content: '';
-    height: 24px;
-    left: -4px;
-    margin-top: -8px;
-    position: absolute;
-    top: -4px;
-    transition: all 0.3s ease-in-out;
-    width: 24px;
-}
-.material-switch > input[type="checkbox"]:checked + label::before {
-    background: inherit;
-    opacity: 0.5;
-}
-.material-switch > input[type="checkbox"]:checked + label::after {
-    background: inherit;
-    left: 20px;
-}
-
-/* docs overrides */
-.a {
-  background-color: #fff;
-  border-color: #d3e0e9;
-}
-
-
-/* general overrides */
-.b .c {
-  line-height: 1.4;
-}
-.d .close {
-  margin-top: 4px;
-}
-
-
-/* navbar */
-.app-navbar {
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-}
-.app-navbar .form-control {
-  box-shadow: none;
-}
-.app-navbar .e img {
-  width: 85px;
-}
-.app-navbar .f {
-  max-height: inherit;
-}
-.app-navbar .f:after {
-  height: 100vh;
-}
-.app-navbar .form-control {
-  border-color: #1C73A5;
-}
-.g {
-  margin-left: -12px;
-  padding-bottom: 10px !important;
-}
-.g .h:before {
-  font-size: 20px;
-}
 @media (min-width: 768px) {
-  .app-navbar .f:after {
-    height: auto;
-  }
-}
-@media (max-width: 768px) {
-  .i {
-    margin-top: -1px;
+  body {
+    padding-top:    50px;
+    padding-bottom: 50px;
   }
 }
 
 
-/* misc */
-.j {
-  max-width: 280px;
-  margin-top: -60px;
+/* global spacing overrides */
+h1, h2, h3, h4, h5, h6,
+.a, .b, .c, .d, .e, .f {
+  margin-top: 0;
 }
-.k {
-  margin-right: 10px;
+hr {
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
-.l {
-  width: 40%;
-  display: inline-block;
-}
-.l img {
-  width: 100%;
+
+.g,
+.h {
+  border-bottom: 0;
 }
