@@ -1,0 +1,7 @@
+flask
+flask-wtf
+flask-sqlalchemy
+mysql-python
+requests
+cairosvg
+flask_mail
