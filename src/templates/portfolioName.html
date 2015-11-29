@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+
+    <title>
+      __Verify
+    </title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
+
+ <style>
+      #login {
+          padding-top: 35px
+      }
+      #login .form-wrap {
+          width: 235px;
+          height: 418px;
+          margin: 0 auto;
+          padding-top:130px;
+      }
+      #login h1 {
+          color: black;
+          font-size: 18px;
+          text-align: center;
+          font-weight: bold;
+          padding-bottom: 20px;
+      }
+      #login .form-group {
+          margin-bottom: 25px;
+      }
+      #login .checkbox {
+          margin-bottom: 20px;
+          position: relative;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          -o-user-select: none;
+          user-select: none;
+      }
+      #login .checkbox.show:before {
+          content: '\e013';
+          color: black;
+          font-size: 17px;
+          margin: 1px 0 0 3px;
+          position: absolute;
+          pointer-events: none;
+          font-family: 'Glyphicons Halflings';
+      }
+      #login .checkbox .character-checkbox {
+          width: 25px;
+          height: 25px;
+          cursor: pointer;
+          border-radius: 3px;
+          border: 1px solid #ccc;
+          vertical-align: middle;
+          display: inline-block;
+      }
+      #login .checkbox .label {
+          color: black;
+          font-size: 13px;
+          font-weight: normal;
+      }
+      #login .btn.btn-custom {
+          font-size: 14px;
+        margin-bottom: 20px;
+      }
+      #login .forget {
+          font-size: 13px;
+        text-align: center;
+        display: block;
+      }
+
+      /*    --------------------------------------------------
+        :: Inputs & Buttons
+        -------------------------------------------------- */
+      .form-control {
+          color: black;
+      }
+      .btn-custom {
+          color: #fff;
+        background-color: black;
+      }
+      .btn-custom:hover,
+      .btn-custom:focus {
+          color: #fff;
+      }
+
+      /*    --------------------------------------------------
+          :: Footer
+        -------------------------------------------------- */
+      #footer {
+          color: black;
+          font-size: 12px;
+          text-align: center;
+      }
+      #footer p {
+          margin-bottom: 0;
+      }
+      #footer a {
+          color: inherit;
+      }
+      .registerPrompt {
+           position: absolute;
+           margin-top: 5px;
+           right: 0;
+           margin-right: 5px;
+           height: 26px;
+           width: 210.50px;
+           border-radius: 2px;
+           background-color: black;
+           color: white;
+      }
+
+      #registerText {
+        font-size: 14px;
+        padding:2px;
+      }
+    </style>
+
+  </head>
+
+
+<body>
+<!-- <div class="registerPrompt" id="registerText"><a href="/signin" style="color:white;">ALREADY HAVE AN ACCOUNT?</a></div> -->
+
+<section id="login" class="emailOption">
+    <div class="container">
+      <div class="row">
+          <div class="col-xs-12">
+              <div class="form-wrap">
+                <h1>One final step: what would you like to name your portfolio?</h1>
+                <p class="forget">This is a crucial step; it's how people will go to and see your portfolio.</p><br>
+                        <div class="form-group">
+                            <label for="email" class="sr-only">Email</label>
+                            <input type="email" name="nameInput" id="text" class="form-control" placeholder="Desired name">
+                            <br>
+                            <input type="submit" name="setName" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Finish">
+                        </div>
+                       
+                      <!--   <a href="javascript:;" id="textInstead" class="forget">Want the code sent to your phone instead of your e-mail?</a> -->
+                  
+              </div>
+        </div> <!-- /.col-xs-12 -->
+      </div> <!-- /.row -->
+    </div> <!-- /.container -->
+</section>
+
+
+</body>
+<script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
+<script>
+  $( "[name='setName']" ).click(function() {
+      $.ajax({
+        url: '/portfolio/updateName',
+        type: 'POST',
+        data: { "portfolioName": $("[name='nameInput']").val() },
+        success: function (data) {
+          if (data.success == 'true') {
+            window.location.href = '/dashboard';
+          } else {
+            console.log('name is already taken');
+            console.log(data);
+          }
+        },
+        dataType: 'json'
+      });   
+  });
+</script>
+</html>

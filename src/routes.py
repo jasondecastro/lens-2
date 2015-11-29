@@ -70,7 +70,12 @@ def dashboard():
   user = User.query.filter_by(username = session['username']).first()
 
   if user.verified == 0:
+    print 'user is not verified'
     return redirect(url_for('verify'))
+
+  if user.portfolioname == None or len(user.portfolioname.replace(' ', '')) < 1:
+    print 'user does not have a portfolioname'
+    return redirect(url_for('portfolioSetup'))
 
   user = User.query.filter_by(username = session['username']).first()
   uploads = Upload.query.filter_by(publisher=session['username'])
@@ -151,7 +156,7 @@ def dashboard():
           return redirect(url_for('dashboard'))
 
 
-    return render_template('dashboard.html', User=User, peopleFollowing=peopleFollowing, posts=posts, random_people=random_people, bio=bio, uploads=uploads, location=location,
+    return render_template('dashboard.html', User=User, user=user, peopleFollowing=peopleFollowing, posts=posts, random_people=random_people, bio=bio, uploads=uploads, location=location,
                             github=github, instagram=instagram, username=username, firstname=firstname,
                             lastname=lastname, figure=figure, following=following,
                             followers=followers, twitter=twitter,
@@ -225,15 +230,38 @@ def verify():
     if user.verified == 0:
       return render_template('verify.html', user=user)
     else:
-      return redirect(url_for('dashboard'))
+      if user.portfolioname == None or len(user.portfolioname.replace(' ', '')) < 1:
+        return redirect(url_for('portfolioSetup'))
+      else:
+        return redirect(url_for('dashboard'))
 
 
-@app.route('/confirm', methods=['GET', 'POST'])
-def confirm():
-  # user_table = User.query.filter_by(username = session['username']).first()
-  # for user in user_table:
-  #   print user 
-  return render_template('confirmcode.html')
+@app.route('/portfolio/setup', methods=['GET', 'POST'])
+def portfolioSetup():
+  if 'username' not in session:
+    return redirect(url_for('signin'))
+  else:
+    user = User.query.filter_by(username = session['username']).first()
+    if user.portfolioname == None or len(user.portfolioname.replace(' ', '')) < 1:
+      return render_template('portfolioName.html', user=user)
+    else:
+      if user.verified == 0:
+        return redirect(url_for('verify'))
+      else:
+        return redirect(url_for('dashboard'))
+
+@app.route('/portfolio/updateName', methods=['GET', 'POST'])
+def portfolioName():
+  user = User.query.filter_by(username = session['username']).first()
+  portfolioName = request.form['portfolioName']
+
+  if len(portfolioName.replace(' ', '')) > 1:
+    user.portfolioname = portfolioName
+    db.session.commit()
+    print user.portfolioname
+    return jsonify({'success': 'true'})
+  else:
+    return jsonify({'success': 'false'})
 
 def send_sms(msg, to):
   print msg
@@ -317,7 +345,6 @@ def updateEmail():
 
   return jsonify({'success': 'false'})
 
-
 #-- LOGIN PAGE --#
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
@@ -331,7 +358,11 @@ def signin():
       return render_template('signin.html', form=form)
     else:
       session['username'] = form.username.data
-      return redirect(url_for('dashboard'))
+      user = User.query.filter_by(username = session['username']).first()
+      if user.portfolioname == None or len(user.portfolioname.replace(' ', '')) < 1:
+        return redirect(url_for('portfolioSetup'))
+      else:
+        return redirect(url_for('dashboard'))
 
   elif request.method == 'GET':
     return render_template('signin.html', form=form)
