@@ -5,3 +5,4 @@ mysql-python
 requests
 cairosvg
 flask_mail
+twilio
