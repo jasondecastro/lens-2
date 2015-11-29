@@ -7,6 +7,7 @@ from flask import Flask, redirect, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import func, select
 from werkzeug import secure_filename
+from twilio.rest import TwilioRestClient
 
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -234,6 +235,21 @@ def confirm():
   #   print user 
   return render_template('confirmcode.html')
 
+def send_sms(msg, to):
+  print msg
+  sid = "AC499b0b2477461f0b417fd79f0cc0a9b3"
+  auth_token = "1a1f186e149af311706de4701b0e96a3"
+  twilio_number = "6463623998"
+
+  client = TwilioRestClient(sid, auth_token)
+
+  message = client.messages.create(body="Your Verification Code: " + msg,
+                                   from_=twilio_number,
+                                   to=to,
+                                   )
+
+  print 'successfully sent sms'
+
 def send_email(user, pwd, recipient, subject, body):
   import smtplib
   print body
@@ -262,11 +278,18 @@ def sendVerificationCode():
   user = User.query.filter_by(username = session['username']).first()
   email_to_send_code_to = user.email
 
-  phone_number = request.form["phoneNumber"]
+  try:
+    phone_number = int(request.form["phoneNumber"].replace('-', '').replace('(', '').replace(')', '').replace(' ', ''))
+  except:
+    phone_number = ''
 
-  if len(phone_number) >=10:
+  if phone_number >= 10:
     user.phonenumber = phone_number
     db.session.commit()
+    try:
+      send_sms(user.verification_code, user.phonenumber)
+    except:
+      print 'Something is wrong with the number'
   else:
     send_email("roadbeam.noreply@gmail.com", "roadbeam.com", email_to_send_code_to, "Your Verification Code", user.verification_code)
   

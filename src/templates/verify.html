@@ -172,7 +172,7 @@
                         </div>
                        
                         <hr>
-                        <a href="/signin" class="forget">Already have an account?</a>
+                        <a href="javascript:;" id="textInstead" class="forget">Want the code sent to your phone instead of your e-mail?</a>
                   
               </div>
         </div> <!-- /.col-xs-12 -->
@@ -185,7 +185,7 @@
       <div class="row">
           <div class="col-xs-12">
               <div class="form-wrap">
-                <h1>We have successfully sent a 6 digit verification code</h1>
+                <h1>Please confirm your 10 digit phone number below</h1>
                         <div class="form-group">
                             <label for="email" class="sr-only">Email</label>
                             <input type="email" name="personsNumber" id="email" class="form-control" placeholder="xxx-xxx-xxx" >
@@ -198,7 +198,7 @@
                         </div>
                        
                         <hr>
-                        <a href="/signin" class="forget">Already have an account?</a>
+                        <a href="javascript:;" id="emailInstead" class="forget">Want the code sent to your e-mail instead of your phone?</a>
                   
               </div>
         </div> <!-- /.col-xs-12 -->
@@ -211,11 +211,23 @@
 <script>
   $(".emailOption").hide()
   $(".textOption").hide()
+
+  $("#emailInstead").click(function(){
+     $(".textOption").hide()
+     $(".emailOption").show()
+  });
+  $("#textInstead").click(function(){
+     $(".emailOption").hide()
+     $(".textOption").show()
+  });
+
   $( "[name='emailOption']" ).click(function() {
       $.ajax({
             url: '/sendVerificationCode',
             type: 'POST',
+            data: { "phoneNumber": 'xxx-xxx-xxx' },
             success: function () {},
+            dataType: 'json'
       });  
 
       $(".portal").fadeOut(1500).delay(0).queue(function(n){
@@ -261,7 +273,8 @@
           if (data.success == 'true') {
             window.location.href = '/dashboard';
           } else {
-            alert('invalid code');
+            console.log('invalid code');
+            console.log(data);
           }
         },
         dataType: 'json'
