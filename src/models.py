@@ -14,6 +14,7 @@ class User(db.Model):
 	email = db.Column(db.String(120), unique=True)
 	pwdhash = db.Column(db.String(54))
 	verification_code = db.Column(db.String(7))
+	verified = db.Column(db.Integer)
 	figure = db.Column(db.String(120))
 	twitter = db.Column(db.String(120))
 	instagram = db.Column(db.String(120))
@@ -26,13 +27,14 @@ class User(db.Model):
 	profile_picture = db.Column(db.String(255), nullable=False)
 	cover_picture = db.Column(db.String(255), nullable=False)
 
-	def __init__(self, firstname, lastname, username, password):
+	def __init__(self, firstname, lastname, username, password, email):
 		self.firstname = firstname.title()
 		self.lastname = lastname.title()
 		self.username = username.lower()
-		self.email = 'notverified_%s@roadbeam.com' % random.randint(0,999999)
+		self.email = email.lower()
 		self.set_password(password)
 		self.verification_code = str(random.randint(100000,999999))
+		self.verified = 0
 		self.figure = "ch-878-1409-72.hd-180-10.sh-3089-64.lg-3202-82-1408.hr-3278-1394-40"
 		self.twitter = None
 		self.instagram = None

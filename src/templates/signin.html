@@ -105,13 +105,31 @@
       #footer a {
           color: inherit;
       }
+
+      .registerPrompt {
+           position: absolute;
+           margin-top: 5px;
+           right: 0;
+           margin-right: 5px;
+           height: 26px;
+           width: 190.50px;
+           border-radius: 2px;
+           background-color: black;
+           color: white;
+      }
+
+      #registerText {
+        font-size: 14px;
+        padding:2px;
+      }
     </style>
 
   </head>
 
 
 <body>
-
+<!-- <div class="registerPrompt" id="registerText"><a href="/signup" style="color:white;">DON'T HAVE AN ACCOUNT?</a></div>
+ -->
 <section id="login">
     <div class="container">
       <div class="row">
@@ -128,6 +146,8 @@
                             {{ form.password(placeholder="Password", id="key", class="form-control")}}
                         </div>
                         {{ form.submit(id="btn-login", class="btn btn-custom btn-lg btn-block", value="Continue")}}
+                        <hr>
+                        <a href="/signup" class="forget">Don't have an account?</a>
                     </form>
                   
               </div>

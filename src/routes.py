@@ -44,26 +44,10 @@ def upload():
 def quality_check(post):
   return True
 
-@app.route('/getTextPost', methods=['GET', 'POST'])
-def getTextPost():
-  user_post = str(request.form["text_post"])
-  user = User.query.filter_by(username = session['username']).first()
-  
-  if len(user_post) < 340:
-    if quality_check(user_post):
-      new_post = Posts(user.firstname, user.lastname, user.username, user.id, user_post, None, None)
-      db.session.add(new_post)
-      db.session.commit()
-      return jsonify({'success': 'true'})
-    else:
-      return 'no quality'
-  else:
-    return 'too large'
-
 @app.route('/delete/<int:id>', methods=['POST', 'GET'])
 def remove(id):
     """Delete an uploaded file."""
-    upload = Upload.query.get_or_404(id)
+    upload = Upload.query.get(id)
 
     if upload.publisher == session['username']:
         db.session.delete(upload)
@@ -73,162 +57,19 @@ def remove(id):
 
     return redirect(url_for('dashboard'))
 
-@app.route("/<username>/gallery")
-def gallery(username):
-    uploads = Upload.query.all()
-    return render_template('gallery.html', username=username, uploads=uploads)
-
 @app.route('/')
 def home():
-  return render_template('index.html')
-
-@app.route('/account/settings', methods=['GET', 'POST'])
-def accountsettings():
-  form = CompleteProfileForm()
-
-  user = User.query.filter_by(username = session['username']).first()
-
-  if request.method == 'POST':
-    if form.validate() == False:
-      return render_template('accountsettings.html', form=form)
-    else:
-      if form.twitter.data >= 1:
-        user.twitter = form.twitter.data
-        db.session.commit()
-      if form.instagram.data >= 1:
-        user.instagram = form.instagram.data
-        db.session.commit()
-      if form.github.data >= 1:
-        user.github = form.github.data
-        db.session.commit()
-      if form.location.data >= 1:
-        user.location = form.location.data
-        db.session.commit()
-      if form.bio.data >= 1:
-        user.bio = form.bio.data
-        db.session.commit()
-
-      return redirect(url_for('accountdetails'))
-
-  elif request.method == 'GET':
-    if user is None:
-      print 'yes'
-      return redirect(url_for('signin'))
-    else:
-      firstname = user.firstname
-      lastname = user.lastname
-      username = user.username
-      figure = user.figure
-      location = user.location
-      following = user.following
-      followers = user.followers
-      twitter = user.twitter
-      appreciations = user.appreciations
-      instagram = user.instagram
-      github = user.github
-      bio = user.bio
-      location = user.location
-
-
-
-      return render_template('accountsettings.html', form=form, bio=bio, location=location,
-                              github=github, instagram=instagram, username=username, firstname=firstname,
-                              lastname=lastname, figure=figure, following=following,
-                              followers=followers, twitter=twitter,
-                              appreciations=appreciations)
-
-@app.route('/account/details')
-def accountdetails():
-  form = CompleteProfileForm()
-
-  if 'username' not in session:
-    return redirect(url_for('signin'))
-
-  user = User.query.filter_by(username = session['username']).first()
-
-  if user is None:
-    return redirect(url_for('signin'))
-  else:
-    firstname = user.firstname
-    lastname = user.lastname
-    username = user.username
-    figure = user.figure
-    location = user.location
-    following = user.following
-    followers = user.followers
-    twitter = user.twitter
-    appreciations = user.appreciations
-    instagram = user.instagram
-    github = user.github
-    bio = user.bio
-    location = user.location
-
-
-    return render_template('accountdetails.html', form=form, bio=bio, location=location,
-                            github=github, instagram=instagram, username=username, firstname=firstname,
-                            lastname=lastname, figure=figure, following=following,
-                            followers=followers, twitter=twitter,
-                            appreciations=appreciations)
-
-@app.route('/somedetails', methods=['GET', 'POST'])
-def somedetails():
-  form = CompleteProfileForm()
-
-  if 'completeprofile' not in session:
-    return redirect(url_for('dashboard'))
-
-  if request.method == 'POST':
-    if form.validate() == False:
-      return render_template('somedetails.html', form=form)
-    else:
-      userinfo = User.query.filter_by(username=session['username']).first()
-      if form.twitter.data >= 1:
-        userinfo.twitter = form.twitter.data
-        db.session.commit()
-      if form.instagram.data >= 1:
-        userinfo.instagram = form.instagram.data
-        db.session.commit()
-      if form.github.data >= 1:
-        userinfo.github = form.github.data
-        db.session.commit()
-      if form.location.data >= 1:
-        userinfo.location = form.location.data
-        db.session.commit()
-      if form.bio.data >= 1:
-        userinfo.bio = form.bio.data
-        db.session.commit()
-
-      session.pop('completeprofile', None)
-
-      return redirect(url_for('dashboard'))
-
-  elif request.method == 'GET':
-    return render_template('somedetails.html', form=form)
-
-@app.route('/follow/<username>', methods=['GET', 'POST'])
-def follow(username):
-  if 'username' not in session:
-    return redirect(url_for('signin'))
-
-  follower = User.query.filter_by(username=session['username']).first()
-  
-  try:
-    followed = User.query.filter_by(username=username).first()
-  except:
-    return 'no such user exists ===('
-
-  if Follow.query.filter((Follow.follower_username==session['username']) & (Follow.followed_username==username)).count() >= 1:
-    return 'you can\'t follow the same guy twice dude..'
-  else:
-    add_follower = Follow(username, session['username'], followed.id, follower.id)
-    db.session.add(add_follower)
-    db.session.commit()
-  return jsonify({'success': 'true'})
+  return redirect(url_for('signin'))
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
   if 'username' not in session:
     return redirect(url_for('signin'))
+
+  user = User.query.filter_by(username = session['username']).first()
+
+  if user.verified == 0:
+    return redirect(url_for('verify'))
 
   user = User.query.filter_by(username = session['username']).first()
   uploads = Upload.query.filter_by(publisher=session['username'])
@@ -278,7 +119,7 @@ def dashboard():
 
   posts = Posts.query.filter(Posts.poster_username.in_(postsFollowing))
 
-  upload_folder = '/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s' % session['username']
+  upload_folder = '/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s' % session['username']
 
   if user is None:
     return redirect(url_for('signin'))
@@ -315,123 +156,23 @@ def dashboard():
                             followers=followers, twitter=twitter,
                             appreciations=appreciations)
 
-@app.route('/getFollowers', methods=['GET', 'POST'])
-def getFollowers():
-  user = User.query.filter_by(username=session['username']).first()
-
-  randomPeople = []
-  theUserDatabase = User.query.all()
-  listOfUsernames = []
-  theFollowersDatabase = Follow.query.all()
-  listOfFollowers = {}
-  for everyUser in theUserDatabase:
-    listOfUsernames.append(everyUser.username)
-  for everyFollower in theFollowersDatabase:
-    listOfFollowers[everyFollower.followed_username] = everyFollower.follower_username
-
-  print listOfUsernames
-  print listOfFollowers
-
-  peopleFollowedAlready = []
-  peopleHaventFollowedAlready = listOfUsernames
-
-  if set(listOfUsernames) & set(listOfFollowers):
-    print 'yes'
-    randomPerson = random.choice(listOfUsernames)
-    for key in listOfFollowers:
-      print 'good'
-      if session['username'] == listOfFollowers[key]:
-        print 'test'
-        peopleFollowedAlready.append(key)
-        peopleHaventFollowedAlready.remove(key)
-      else:
-        print 'nope'
-
-  try:
-    personToRemove = random.choice(peopleHaventFollowedAlready)
-  except IndexError:
-    print 'You have followed everyone.'
-
-  if personToRemove in peopleFollowedAlready:
-    peopleHaventFollowedAlready.remove(personToRemove)
-  print 'yes'
-  print peopleHaventFollowedAlready
-  print peopleFollowedAlready
-
-  returnedFollower = User.query.filter_by(username=personToRemove).first()
-  return jsonify({'success': [returnedFollower.firstname, returnedFollower.lastname, returnedFollower.username] })  
-
-@app.route('/unfollow/<followed_username>', methods=['GET', 'POST'])
-def unfollowUser(followed_username):
-  print 'this is good 1'
-  print 'this is good 2'
-  user = Follow.query.filter_by(followed_username=followed_username)
-  print 'this is good 3'
-  for personFollowing in user:
-    if Follow.query.filter((Follow.followed_username==followed_username) & (Follow.follower_username==session['username'])).count() >= 1:
-      # db.session.delete(Follow.query.filter((Follow.followed_username==followed_username) & (Follow.follower_username==session['username'])))
-      db.session.delete(user)
-      db.session.commit()
-
-  return jsonify({'success': 'you have unfollowed this user'})
-
-  # if User.query.filter_by(username=username).first().followers >= 1:
-  #   a = Follow.query.filter_by(followed_username=username)
-  #   for i in a:
-  #     if user.username != a.follower_username:
-  #       print a.follower_username
-  #       print 'you is not following person'
-
-  # # followers = []
-  # # for i in User.query.all():
-  # #   print i.followers
-  # #   if i.followers >= 1:
-  # #     print i.followers
-  # #     print i.username
-  # #     a = Follow.query.filter_by(followed_username=i).first()
-  # #     print a
-  # #     if user.username != a.follower_username:
-  # #       followers.append(i)
-  # #   else:
-  # #     followers.append(i)
-
-# def randomword(length):
-#   return u''.join(random.choice(string.lowercase) for i in range(length))
-
-# def profileSetup(username, db):
-#   topics = ["abstract", "animals", "business", "cats", "city", "food", "nightlife", "fashion", "people", "nature", "sports", "technics", "transport"]
-
-#   count = 0
-#   while count <= 15:
-#     url = "http://lorempixel.com/1900/1200/%s/" % random.choice(topics)
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#       print url
-#       filename = randomword(7) + ".jpg"
-#       f = open("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/%s" % (username, filename), 'wb')
-#       f.write(response.content)
-#       f.close()
-
-#       with app.app_context():
-#         newupload = Upload(filename, 'accounts/%s/%s' % (username, filename), username, "none", "none")
-#         db.session.add(newupload)
-#         db.session.commit()
-
-#     count = count + 1
-
 #-- REGISTER PAGE --#
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+  print 'good'
   form = SignupForm()
 
   if 'username' in session:
-    return redirect(url_for('somedetails'))
+    return redirect(url_for('dashboard'))
 
   if request.method == 'POST':
+    print 'better'
     if form.validate() == False:
+      print 'is it false?'
+      print form
       return render_template('signup.html', form=form)
     else:
-      newuser = User(form.firstname.data, form.lastname.data, form.username.data, form.password.data)
+      newuser = User(form.firstname.data, form.lastname.data, form.username.data, form.password.data, form.email.data)
       # add_follower = Follow(username, session['username'], followed.id, follower.id)
       db.session.add(newuser)
       # db.session.add(add_follower)
@@ -439,14 +180,14 @@ def signup():
 
       session['username'] = newuser.username
 
-      if not os.path.exists("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s" % session['username']):
-        os.mkdir("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s" % session['username'])
+      if not os.path.exists("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s" % session['username']):
+        os.mkdir("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s" % session['username'])
       
-      if not os.path.exists("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/profile_picture" % session['username']):
-        os.mkdir("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/profile_picture" % session['username'])
+      if not os.path.exists("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s/profile_picture" % session['username']):
+        os.mkdir("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s/profile_picture" % session['username'])
 
-      if not os.path.exists("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/cover_picture" % session['username']):
-        os.mkdir("/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/cover_picture" % session['username'])
+      if not os.path.exists("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s/cover_picture" % session['username']):
+        os.mkdir("/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s/cover_picture" % session['username'])
 
       url = 'http://invatar0.appspot.com/svg/%s%s.jpg?s=256' % (form.firstname.data[:1], form.lastname.data[:1])
       # response = requests.get(url)
@@ -459,7 +200,7 @@ def signup():
 
       response = requests.get(url)
       if response.status_code == 200:
-        f = open('/Users/developeraccount/Desktop/Roadbeam/roadbeam/src/static/accounts/%s/profile_picture/profile.jpg' % session['username'], 'wb')
+        f = open('/Users/developeraccount/Desktop/Lens/lens/src/static/accounts/%s/profile_picture/profile.jpg' % session['username'], 'wb')
         f.write(response.content)
         f.close()
 
@@ -476,7 +217,15 @@ def signup():
 
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
-  return render_template('verifyemail.html')
+  if 'username' not in session:
+    return redirect(url_for('signin'))
+  else:
+    user = User.query.filter_by(username = session['username']).first()
+    if user.verified == 0:
+      return render_template('verify.html', user=user)
+    else:
+      return redirect(url_for('dashboard'))
+
 
 @app.route('/confirm', methods=['GET', 'POST'])
 def confirm():
@@ -510,8 +259,8 @@ def send_email(user, pwd, recipient, subject, body):
 
 @app.route('/sendVerificationCode', methods=['GET', 'POST'])
 def sendVerificationCode():
-  email_to_send_code_to = request.form['email_to_send_code_to']
   user = User.query.filter_by(username = session['username']).first()
+  email_to_send_code_to = user.email
 
   send_email("roadbeam.noreply@gmail.com", "roadbeam.com", email_to_send_code_to, "Your Verification Code", user.verification_code)
   
@@ -523,9 +272,21 @@ def getVerificationCode():
   user = User.query.filter_by(username = session['username']).first()
 
   if code == user.verification_code:
+    user.verified = 1
+    db.session.commit()
     return jsonify({'success': 'true'})
   else:
     return jsonify({'success': 'false'})
+
+@app.route('/updateEmail', methods=['GET', 'POST'])
+def updateEmail():
+  email = request.form["email"]
+  user = User.query.filter_by(username = session['username']).first()
+  user.email = email
+  db.session.commit()
+  send_email("roadbeam.noreply@gmail.com", "roadbeam.com", user.email, "Your Verification Code", user.verification_code)
+
+  return jsonify({'success': 'false'})
 
 
 #-- LOGIN PAGE --#
@@ -566,7 +327,7 @@ def profile(username):
   uploads = Upload.query.filter_by(publisher=username)
 
   if user is None:
-    return render_template('404.html')
+    return 'none'
   else:
     firstname = user.firstname
     lastname = user.lastname
