@@ -15,6 +15,7 @@ class User(db.Model):
 	pwdhash = db.Column(db.String(54))
 	verification_code = db.Column(db.String(7))
 	verified = db.Column(db.Integer)
+	phonenumber = db.Column(db.String(120))
 	figure = db.Column(db.String(120))
 	twitter = db.Column(db.String(120))
 	instagram = db.Column(db.String(120))
@@ -35,6 +36,7 @@ class User(db.Model):
 		self.set_password(password)
 		self.verification_code = str(random.randint(100000,999999))
 		self.verified = 0
+		self.phonenumber = None
 		self.figure = "ch-878-1409-72.hd-180-10.sh-3089-64.lg-3202-82-1408.hr-3278-1394-40"
 		self.twitter = None
 		self.instagram = None

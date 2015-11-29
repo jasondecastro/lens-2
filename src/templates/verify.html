@@ -188,13 +188,13 @@
                 <h1>We have successfully sent a 6 digit verification code</h1>
                         <div class="form-group">
                             <label for="email" class="sr-only">Email</label>
-                            <input type="email" name="personsEmail" id="email" class="form-control" placeholder="{{user.email}}" disabled>
+                            <input type="email" name="personsNumber" id="email" class="form-control" placeholder="xxx-xxx-xxx" >
                             <br>
-                            <input type="submit" name="changeEmail" id="btn-login" class="btn btn-custom btn-lg btn-block" value="This is not my e-mail address">
+                            <input type="submit" name="confirmNumber" id="btn-login" class="btn btn-custom btn-lg btn-block" value="This is my correct number">
                             <br>
-                            <input type="email" name="codeInput" id="text" class="form-control" placeholder="Enter the code">
+                            <input type="email" name="codeInput" id="text" class="form-control" placeholder="Enter the code" disabled>
                             <br>
-                            <input type="submit" name="sendCode" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Continue">
+                            <input type="submit" name="sendCode" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Continue" disabled>
                         </div>
                        
                         <hr>
@@ -229,6 +229,29 @@
       }).fadeIn(0);
   });
 
+  hasConfirmedNumber = true;
+  $( "[name='confirmNumber']" ).on('click', function() {
+      if (!hasConfirmedNumber) {
+          hasConfirmedNumber = false;
+          $("[name='personsNumber']").prop("disabled", false);
+          $("[name='confirmNumber']").val("This is my correct number");
+      } else {
+           $.ajax({
+              url: '/sendVerificationCode',
+              data: { "phoneNumber": $("[name='personsNumber']").val() },
+              type: 'POST',
+              success: function () {
+                $("[name='personsNumber']").prop("disabled", true);
+                $("[name='confirmNumber']").prop("disabled", true)
+                $("[name='sendCode']").prop("disabled", false);
+                $("[name='codeInput']").prop("disabled", false);
+                hasConfirmedNumber = true;
+              },
+              dataType: 'json'
+           });  
+      }
+  });
+
   $( "[name='sendCode']" ).click(function() {
       $.ajax({
         url: '/getVerificationCode',
@@ -247,7 +270,6 @@
 
   var changeEmail = $("input[name='changeEmail']");
   hasClickedButton = false;
-
   changeEmail.on('click', function() {
       if (!hasClickedButton) {
           $("[name='personsEmail']").prop("disabled", false);

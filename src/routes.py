@@ -262,7 +262,13 @@ def sendVerificationCode():
   user = User.query.filter_by(username = session['username']).first()
   email_to_send_code_to = user.email
 
-  send_email("roadbeam.noreply@gmail.com", "roadbeam.com", email_to_send_code_to, "Your Verification Code", user.verification_code)
+  phone_number = request.form["phoneNumber"]
+
+  if len(phone_number) >=10:
+    user.phonenumber = phone_number
+    db.session.commit()
+  else:
+    send_email("roadbeam.noreply@gmail.com", "roadbeam.com", email_to_send_code_to, "Your Verification Code", user.verification_code)
   
   return jsonify({"email_to_send_code_to": email_to_send_code_to}) #security flaw
 
